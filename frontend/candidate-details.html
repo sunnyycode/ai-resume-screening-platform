@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate AI Match Analysis - SmartScreen AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .contribution-bar {
+            height: 16px;
+            display: flex;
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 1rem 0;
+            background-color: #e2e8f0;
+        }
+        .contrib-tfidf { background-color: #3b82f6; }
+        .contrib-semantic { background-color: #8b5cf6; }
+        .contrib-skill { background-color: #10b981; }
+        .area-list {
+            list-style: none;
+            padding: 0;
+        }
+        .area-list li {
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.4rem;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .area-strong {
+            background-color: var(--success-light);
+            color: #14532d;
+            border-left: 4px solid var(--success);
+        }
+        .area-weak {
+            background-color: var(--danger-light);
+            color: #7f1d1d;
+            border-left: 4px solid var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/job">Jobs</a></li>
+                <li><a href="/candidates">Candidates</a></li>
+                <li><a href="/live-match">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="margin-bottom: 1.5rem;">
+            <a href="/candidates" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                &larr; Back to Candidates List
+            </a>
+        </div>
+
+        <div id="loadingState" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+            Loading candidate analysis report...
+        </div>
+
+        <div id="analysisContent" style="display: none;">
+            <!-- Header Card -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="badge badge-primary" style="margin-bottom: 0.5rem;" id="badgeJobTitle">Role</span>
+                            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.2rem;" id="candidateName">Candidate Name</h1>
+                            <div style="color: var(--text-secondary); font-size: 0.92rem;" id="candidateContact">email@domain.com</div>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.82rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Overall Match Score</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1;" id="overallScoreText">0%</div>
+                            <div style="margin-top: 0.4rem;" id="recommendationBadge">
+                                <span class="badge badge-success">Recommended</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explainable Breakdown Cards -->
+            <div class="breakdown-grid">
+                <div class="breakdown-card" style="border-top: 4px solid #3b82f6;">
+                    <div style="font-weight: 600; font-size: 0.95rem;">Keyword Relevance (TF-IDF)</div>
+                    <div class="breakdown-weight">Weight: 30% of total</div>
+                    <div class="breakdown-value" style="color: #2563eb;" id="tfidfScore">0%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;" id="tfidfContrib">+0.0 pts</div>
+                </div>
+
+                <div class="breakdown-card" style="border-top: 4px solid #8b5cf6;">
+                    <div style="font-weight: 600; font-size: 0.95rem;">Semantic Similarity (AI)</div>
+                    <div class="breakdown-weight">Weight: 40% of total</div>
+                    <div class="breakdown-value" style="color: #7c3aed;" id="semanticScore">0%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;" id="semanticContrib">+0.0 pts</div>
+                </div>
+
+                <div class="breakdown-card" style="border-top: 4px solid #10b981;">
+                    <div style="font-weight: 600; font-size: 0.95rem;">Skill Coverage</div>
+                    <div class="breakdown-weight">Weight: 30% of total</div>
+                    <div class="breakdown-value" style="color: #059669;" id="skillScore">0%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;" id="skillContrib">+0.0 pts</div>
+                </div>
+            </div>
+
+            <!-- Score Contribution Bar -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 0.4rem;">Score Composition & Weighting Formula</h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.8rem;">
+                        <code>Final Score = 0.30 &times; TF-IDF + 0.40 &times; Semantic + 0.30 &times; Skill</code>
+                    </p>
+                    <div class="contribution-bar">
+                        <div class="contrib-tfidf" id="barTfidf" style="width: 30%;" title="TF-IDF Contribution"></div>
+                        <div class="contrib-semantic" id="barSemantic" style="width: 40%;" title="Semantic Contribution"></div>
+                        <div class="contrib-skill" id="barSkill" style="width: 30%;" title="Skill Contribution"></div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; font-size: 0.82rem; color: var(--text-secondary); flex-wrap: wrap;">
+                        <span><span style="display: inline-block; width: 10px; height: 10px; background: #3b82f6; border-radius: 2px;"></span> TF-IDF Points</span>
+                        <span><span style="display: inline-block; width: 10px; height: 10px; background: #8b5cf6; border-radius: 2px;"></span> Semantic Points</span>
+                        <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></span> Skill Points</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills & Domain Evaluation Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- Matched Skills -->
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--success-light);">
+                        <h3 style="color: #15803d; font-size: 1.05rem;">✅ Matched Skills</h3>
+                    </div>
+                    <div class="card-body" id="matchedSkillsList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Missing Skills -->
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--danger-light);">
+                        <h3 style="color: #b91c1c; font-size: 1.05rem;">❌ Missing Skills</h3>
+                    </div>
+                    <div class="card-body" id="missingSkillsList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strong and Weak Areas -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- Strong Areas -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💪 Strong Domain Alignments</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="area-list" id="strongAreasList"></ul>
+                    </div>
+                </div>
+
+                <!-- Weak Areas -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>⚠️ Identified Gaps / Weak Areas</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="area-list" id="weakAreasList"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extracted Resume Text Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📄 Parsed Resume Text Snapshot</h3>
+                </div>
+                <div class="card-body">
+                    <pre style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; font-size: 0.85rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;" id="resumeSnippet"></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        function getQueryParam(key) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(key);
+        }
+
+        async function loadMatchDetails() {
+            const matchId = getQueryParam("match_id");
+            if (!matchId) {
+                document.getElementById("loadingState").innerHTML = `<div class="alert alert-danger">No match ID specified in URL.</div>`;
+                return;
+            }
+
+            try {
+                const res = await authFetch(`/api/match/${matchId}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    document.getElementById("loadingState").innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error)}</div>`;
+                    return;
+                }
+
+                const m = data.match;
+                document.getElementById("candidateName").innerText = m.candidate_name;
+                document.getElementById("candidateContact").innerText = [m.candidate_email, m.candidate_phone].filter(Boolean).join(" • ") || "No contact info parsed";
+                document.getElementById("badgeJobTitle").innerText = m.job_title;
+
+                const score = m.overall_score;
+                document.getElementById("overallScoreText").innerText = `${score}%`;
+                
+                let recHtml = `<span class="badge badge-success">Recommended for Interview</span>`;
+                if (score < 60) recHtml = `<span class="badge badge-danger">Not Recommended</span>`;
+                else if (score < 80) recHtml = `<span class="badge badge-warning">Moderate Fit</span>`;
+                document.getElementById("recommendationBadge").innerHTML = recHtml;
+
+                // Sub-scores
+                const tfidfPct = Math.round(m.tfidf_score * 100);
+                const semanticPct = Math.round(m.semantic_score * 100);
+                const skillPct = Math.round(m.skill_score * 100);
+
+                document.getElementById("tfidfScore").innerText = `${tfidfPct}%`;
+                document.getElementById("semanticScore").innerText = `${semanticPct}%`;
+                document.getElementById("skillScore").innerText = `${skillPct}%`;
+
+                const tfidfPts = (0.30 * tfidfPct).toFixed(1);
+                const semPts = (0.40 * semanticPct).toFixed(1);
+                const skillPts = (0.30 * skillPct).toFixed(1);
+
+                document.getElementById("tfidfContrib").innerText = `+${tfidfPts} pts contributed`;
+                document.getElementById("semanticContrib").innerText = `+${semPts} pts contributed`;
+                document.getElementById("skillContrib").innerText = `+${skillPts} pts contributed`;
+
+                // Bar widths
+                document.getElementById("barTfidf").style.width = `${tfidfPts}%`;
+                document.getElementById("barSemantic").style.width = `${semPts}%`;
+                document.getElementById("barSkill").style.width = `${skillPts}%`;
+
+                // Matched & Missing Skills
+                const matchedContainer = document.getElementById("matchedSkillsList");
+                if (m.matched_skills && m.matched_skills.length > 0) {
+                    matchedContainer.innerHTML = m.matched_skills.map(s => 
+                        `<span class="skill-tag matched" style="font-size: 0.9rem; padding: 0.35rem 0.75rem;">${escapeHtml(s)}</span>`
+                    ).join("");
+                } else {
+                    matchedContainer.innerHTML = `<span style="color: var(--text-muted);">No required skills directly matched.</span>`;
+                }
+
+                const missingContainer = document.getElementById("missingSkillsList");
+                if (m.missing_skills && m.missing_skills.length > 0) {
+                    missingContainer.innerHTML = m.missing_skills.map(s => 
+                        `<span class="skill-tag missing" style="font-size: 0.9rem; padding: 0.35rem 0.75rem;">${escapeHtml(s)}</span>`
+                    ).join("");
+                } else {
+                    missingContainer.innerHTML = `<span style="color: var(--success); font-weight: 500;">All required skills matched!</span>`;
+                }
+
+                // Strong & Weak Areas
+                const strongContainer = document.getElementById("strongAreasList");
+                if (m.strong_areas && m.strong_areas.length > 0) {
+                    strongContainer.innerHTML = m.strong_areas.map(a => 
+                        `<li class="area-strong"><span>✔️</span> ${escapeHtml(a)}</li>`
+                    ).join("");
+                } else {
+                    strongContainer.innerHTML = `<li style="color: var(--text-muted);">No clear technical dominance detected.</li>`;
+                }
+
+                const weakContainer = document.getElementById("weakAreasList");
+                if (m.weak_areas && m.weak_areas.length > 0) {
+                    weakContainer.innerHTML = m.weak_areas.map(a => 
+                        `<li class="area-weak"><span>⚠️</span> ${escapeHtml(a)}</li>`
+                    ).join("");
+                } else {
+                    weakContainer.innerHTML = `<li style="color: var(--success);">No major domain gaps identified.</li>`;
+                }
+
+                // Resume Snippet with keyword evidence spotlight
+                const rawSnippet = m.resume_text_preview || "Resume text not available.";
+                let highlightedSnippet = escapeHtml(rawSnippet);
+                (m.matched_skills || []).forEach(skill => {
+                    const pattern = new RegExp(`\\b(${escapeHtml(skill)})\\b`, "gi");
+                    highlightedSnippet = highlightedSnippet.replace(pattern, `<mark style="background: #bbf7d0; color: #166534; font-weight: 700; padding: 0 3px; border-radius: 2px;">$1</mark>`);
+                });
+                document.getElementById("resumeSnippet").innerHTML = highlightedSnippet;
+
+                // Reveal UI
+                document.getElementById("loadingState").style.display = "none";
+                document.getElementById("analysisContent").style.display = "block";
+
+            } catch (err) {
+                document.getElementById("loadingState").innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadMatchDetails);
+    </script>
+</body>
+</html>

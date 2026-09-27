@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Live Matcher - SmartScreen AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .sandbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 850px) {
+            .sandbox-grid { grid-template-columns: 1fr; }
+        }
+        .preset-btn {
+            font-size: 0.78rem;
+            padding: 0.25rem 0.55rem;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+        .preset-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .highlighted-text {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .match-highlight {
+            background-color: #bbf7d0;
+            color: #166534;
+            font-weight: 700;
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/job">Jobs</a></li>
+                <li><a href="/candidates">Candidates</a></li>
+                <li><a href="/live-match" class="active">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="margin-bottom: 1.5rem;">
+            <h1 style="font-size: 1.85rem; font-weight: 700;">Interactive AI Match Sandbox</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Test real-time NLP matching without uploading files. Paste any job posting and resume text or use quick presets to view immediate scoring mechanics.
+            </p>
+        </div>
+
+        <div class="sandbox-grid">
+            <!-- Job Input Column -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>1. Job Requirements</h3>
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 0.3rem;">Presets:</span>
+                        <button class="preset-btn" onclick="loadJobPreset('backend')">Python Backend</button>
+                        <button class="preset-btn" onclick="loadJobPreset('frontend')">React Frontend</button>
+                        <button class="preset-btn" onclick="loadJobPreset('ml')">ML Engineer</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="sandboxSkills">Required Skills (comma-separated)</label>
+                        <input type="text" id="sandboxSkills" class="form-control" placeholder="e.g. Python, Flask, SQL, REST API, Git">
+                    </div>
+                    <div class="form-group">
+                        <label for="sandboxJobDesc">Job Description</label>
+                        <textarea id="sandboxJobDesc" class="form-control" rows="8" placeholder="Paste target job description..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resume Input Column -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>2. Candidate Resume Text</h3>
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 0.3rem;">Presets:</span>
+                        <button class="preset-btn" onclick="loadResumePreset('alice')">Alice (Python)</button>
+                        <button class="preset-btn" onclick="loadResumePreset('bob')">Bob (React)</button>
+                        <button class="preset-btn" onclick="loadResumePreset('carol')">Carol (ML)</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="sandboxResumeText">Resume Content</label>
+                        <textarea id="sandboxResumeText" class="form-control" rows="12" placeholder="Paste applicant resume content..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <button onclick="executeLiveMatch()" class="btn btn-primary" style="padding: 0.8rem 2.5rem; font-size: 1.1rem;" id="btnLiveMatch">
+                ⚡ Calculate Live AI Match
+            </button>
+        </div>
+
+        <!-- Evaluation Results Container -->
+        <div id="liveResultContainer" style="display: none;">
+            <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid var(--primary);">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Evaluation Complete</span>
+                            <h2 style="font-size: 1.8rem; font-weight: 800;" id="liveOverallScore">0%</h2>
+                            <div id="liveRecommendation" style="margin-top: 0.2rem;"></div>
+                        </div>
+
+                        <!-- Score Components Grid -->
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="breakdown-card" style="min-width: 140px; padding: 0.8rem;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">TF-IDF (30%)</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #2563eb;" id="liveTfidfScore">0%</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);" id="liveTfidfPts">+0 pts</div>
+                            </div>
+
+                            <div class="breakdown-card" style="min-width: 140px; padding: 0.8rem;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Semantic (40%)</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #7c3aed;" id="liveSemanticScore">0%</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);" id="liveSemanticPts">+0 pts</div>
+                            </div>
+
+                            <div class="breakdown-card" style="min-width: 140px; padding: 0.8rem;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Skill (30%)</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #059669;" id="liveSkillScore">0%</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);" id="liveSkillPts">+0 pts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills & Gaps Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--success-light);">
+                        <h3 style="color: #15803d;">✅ Matched Skills</h3>
+                    </div>
+                    <div class="card-body" id="liveMatchedSkills"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--danger-light);">
+                        <h3 style="color: #b91c1c;">❌ Missing Skills</h3>
+                    </div>
+                    <div class="card-body" id="liveMissingSkills"></div>
+                </div>
+            </div>
+
+            <!-- Keyword Highlight Viewer -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔍 Evidence Spotlight (Matched Keywords Highlighted in Resume)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="highlighted-text" id="liveHighlightedResume"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        const PRESETS = {
+            jobs: {
+                backend: {
+                    skills: "Python, Flask, SQL, REST API, Git, Docker",
+                    desc: "Seeking a Python Backend Engineer to build scalable RESTful APIs and microservices with Flask, PostgreSQL, and Docker. Experience with automated testing and Git workflows is required."
+                },
+                frontend: {
+                    skills: "JavaScript, TypeScript, React, HTML, CSS, Tailwind CSS",
+                    desc: "Looking for a Frontend Specialist proficient with modern JavaScript, TypeScript, React.js, and CSS responsive layout techniques to craft responsive web applications."
+                },
+                ml: {
+                    skills: "Python, Machine Learning, Deep Learning, PyTorch, Scikit-Learn, Pandas",
+                    desc: "Hiring an AI/ML Engineer to train predictive modeling pipelines and NLP transformers using Python, PyTorch, Scikit-Learn, and Pandas on large data sets."
+                }
+            },
+            resumes: {
+                alice: "Alice Walker\nSenior Backend Developer with 4 years building REST APIs with Python, Flask, and PostgreSQL. Proficient with Git, Docker, and SQL query optimization.",
+                bob: "Bob Martinez\nFrontend Engineer with expertise in JavaScript, TypeScript, React, HTML5, and CSS3. Built high performance user interfaces and state components.",
+                carol: "Carol Danvers\nMachine Learning Engineer with 3+ years training deep learning architectures, neural networks, and NLP systems in Python using PyTorch and Scikit-Learn."
+            }
+        };
+
+        function loadJobPreset(type) {
+            if (PRESETS.jobs[type]) {
+                document.getElementById("sandboxSkills").value = PRESETS.jobs[type].skills;
+                document.getElementById("sandboxJobDesc").value = PRESETS.jobs[type].desc;
+            }
+        }
+
+        function loadResumePreset(type) {
+            if (PRESETS.resumes[type]) {
+                document.getElementById("sandboxResumeText").value = PRESETS.resumes[type];
+            }
+        }
+
+        async function executeLiveMatch() {
+            const skills = document.getElementById("sandboxSkills").value.trim();
+            const jobDesc = document.getElementById("sandboxJobDesc").value.trim();
+            const resumeText = document.getElementById("sandboxResumeText").value.trim();
+            const btn = document.getElementById("btnLiveMatch");
+
+            if (!jobDesc || !resumeText) {
+                alert("Please enter both a job description and resume text.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Analyzing Vectors & Embeddings...";
+
+            try {
+                const res = await fetch("/api/match/quick", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        job_description: jobDesc,
+                        required_skills: skills.split(",").map(s => s.trim()).filter(Boolean),
+                        resume_text: resumeText
+                    })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+
+                const ev = data.evaluation;
+                document.getElementById("liveOverallScore").innerText = `${ev.overall_score}%`;
+                
+                let badgeClass = ev.overall_score >= 80 ? "badge-success" : ev.overall_score >= 60 ? "badge-warning" : "badge-danger";
+                document.getElementById("liveRecommendation").innerHTML = `<span class="badge ${badgeClass}">${escapeHtml(ev.recommendation)}</span>`;
+
+                document.getElementById("liveTfidfScore").innerText = `${ev.tfidf_percentage}%`;
+                document.getElementById("liveSemanticScore").innerText = `${ev.semantic_percentage}%`;
+                document.getElementById("liveSkillScore").innerText = `${ev.skill_percentage}%`;
+
+                document.getElementById("liveTfidfPts").innerText = `+${ev.contributions.tfidf_points} pts`;
+                document.getElementById("liveSemanticPts").innerText = `+${ev.contributions.semantic_points} pts`;
+                document.getElementById("liveSkillPts").innerText = `+${ev.contributions.skill_points} pts`;
+
+                // Matched Skills
+                const matchedEl = document.getElementById("liveMatchedSkills");
+                if (ev.matched_skills.length > 0) {
+                    matchedEl.innerHTML = ev.matched_skills.map(s => `<span class="skill-tag matched">${escapeHtml(s)}</span>`).join("");
+                } else {
+                    matchedEl.innerHTML = `<span style="color: var(--text-muted);">None</span>`;
+                }
+
+                // Missing Skills
+                const missingEl = document.getElementById("liveMissingSkills");
+                if (ev.missing_skills.length > 0) {
+                    missingEl.innerHTML = ev.missing_skills.map(s => `<span class="skill-tag missing">${escapeHtml(s)}</span>`).join("");
+                } else {
+                    missingEl.innerHTML = `<span style="color: var(--success);">All required skills matched!</span>`;
+                }
+
+                // Highlighted Text Spotlight
+                let highlighted = escapeHtml(resumeText);
+                ev.matched_skills.forEach(skill => {
+                    const pattern = new RegExp(`\\b(${escapeHtml(skill)})\\b`, "gi");
+                    highlighted = highlighted.replace(pattern, `<span class="match-highlight">$1</span>`);
+                });
+                document.getElementById("liveHighlightedResume").innerHTML = highlighted;
+
+                document.getElementById("liveResultContainer").style.display = "block";
+                document.getElementById("liveResultContainer").scrollIntoView({ behavior: "smooth" });
+
+            } catch (err) {
+                alert(`Analysis failed: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "⚡ Calculate Live AI Match";
+            }
+        }
+
+        // Preload default backend preset on initial load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadJobPreset('backend');
+            loadResumePreset('alice');
+        });
+    </script>
+</body>
+</html>

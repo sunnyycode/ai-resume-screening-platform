@@ -1,0 +1,28 @@
+Alice Walker
+Email: alice.walker@email.com
+Phone: +1-555-019-2834
+LinkedIn: linkedin.com/in/alicewalker-dev
+
+SUMMARY:
+Results-driven Senior Backend Developer with 4 years of experience building scalable RESTful web APIs and microservices using Python, Flask, and PostgreSQL. Proficient with Docker, Git, CI/CD pipelines, and cloud deployment on AWS.
+
+TECHNICAL SKILLS:
+- Languages: Python, SQL, C++, Bash
+- Frameworks & Libraries: Flask, FastAPI, SQLAlchemy, PyTest, NumPy, Pandas
+- Databases: PostgreSQL, MySQL, Redis, SQLite
+- Cloud & Tools: Docker, Git, GitHub Actions, AWS, Linux, NGINX
+
+PROFESSIONAL EXPERIENCE:
+Software Engineer | DataCore Systems | 2022 - Present
+- Architected and implemented high-throughput REST APIs in Python using Flask and SQLAlchemy, handling 2M+ daily requests.
+- Integrated Redis caching layers, reducing database read latency by 45%.
+- Implemented comprehensive automated unit and integration tests using pytest, achieving 92% code coverage.
+- Configured automated CI/CD pipelines via GitHub Actions and containerized microservices using Docker.
+
+Junior Backend Developer | CloudVibe Inc. | 2020 - 2022
+- Developed database migration scripts and optimized complex SQL queries in PostgreSQL.
+- Built authentication services using JWT and secure password hashing.
+- Collaborated in an agile scrum team to deliver production backend features on two-week sprint cycles.
+
+EDUCATION:
+B.Tech in Computer Science and Engineering | State University (2016 - 2020)

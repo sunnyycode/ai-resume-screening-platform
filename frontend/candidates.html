@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Screening & Ranking - SmartScreen AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/job">Jobs</a></li>
+                <li><a href="/candidates" class="active">Candidates</a></li>
+                <li><a href="/live-match">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Top Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 1.85rem; font-weight: 700;">Candidate Screening & Ranking</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Review AI-ranked applicants, compare skill overlap, and analyze match components.</p>
+            </div>
+            <div style="display: flex; gap: 0.8rem;">
+                <button onclick="exportCandidatesCSV()" class="btn btn-secondary" id="btnExportCsv">
+                    📥 Export CSV Report
+                </button>
+                <button onclick="openUploadModal()" class="btn btn-primary">
+                    📤 Upload & Match Resume
+                </button>
+            </div>
+        </div>
+
+        <!-- Job Selection Dropdown & Overview -->
+        <div style="margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem;">
+            <label for="jobSelect" style="font-weight: 600; font-size: 0.95rem;">Select Active Job:</label>
+            <select id="jobSelect" class="form-control" style="max-width: 400px; font-weight: 500;">
+                <option value="">Loading jobs...</option>
+            </select>
+        </div>
+
+        <!-- Selected Job Info Banner -->
+        <div id="currentJobInfo"></div>
+
+        <!-- Filter & Search Controls -->
+        <div class="filter-bar">
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Search</label>
+                <input type="text" id="filterSearch" class="form-control" placeholder="Search candidate name...">
+            </div>
+
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Min Match Score</label>
+                <input type="number" id="filterMinScore" class="form-control" placeholder="e.g. 70" min="0" max="100" style="width: 120px;">
+            </div>
+
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Filter by Skill</label>
+                <input type="text" id="filterSkill" class="form-control" placeholder="e.g. Python, Docker">
+            </div>
+
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Sort by</label>
+                <select id="filterSort" class="form-control">
+                    <option value="desc">Highest Score First</option>
+                    <option value="asc">Lowest Score First</option>
+                </select>
+            </div>
+
+            <div style="margin-left: auto; align-self: flex-end;">
+                <span id="candidateCount" style="font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;">0 Candidates Ranked</span>
+            </div>
+        </div>
+
+        <!-- Candidates Table -->
+        <div class="card">
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">Rank</th>
+                                <th>Candidate</th>
+                                <th style="width: 150px;">Match Score</th>
+                                <th style="width: 150px;">Component Scores</th>
+                                <th>Matched Skills</th>
+                                <th>Missing Skills</th>
+                                <th style="width: 110px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="candidatesTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    Select a job to view ranked candidates.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Upload Resume Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Upload Candidate Resume</h3>
+                <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+            </div>
+            <form id="resumeUploadForm">
+                <div class="modal-body">
+                    <div id="uploadAlert"></div>
+
+                    <div class="form-group">
+                        <label for="uploadJobSelect">Match Against Job (Optional):</label>
+                        <select id="uploadJobSelect" class="form-control">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="candidateName">Candidate Name (Optional - inferred if blank):</label>
+                        <input type="text" id="candidateName" class="form-control" placeholder="e.g. Sarah Jenkins">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Resume File (PDF, DOCX, TXT):</label>
+                        <input type="file" id="resumeFile" class="form-control" accept=".pdf,.docx,.txt" required>
+                        <small style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                            Supports .pdf, .docx, and .txt files up to 10 MB.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadSubmitBtn">Upload & Match</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/candidates.js"></script>
+</body>
+</html>

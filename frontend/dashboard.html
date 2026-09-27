@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard - SmartScreen AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard" class="active">Dashboard</a></li>
+                <li><a href="/job">Jobs</a></li>
+                <li><a href="/candidates">Candidates</a></li>
+                <li><a href="/live-match">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 1.85rem; font-weight: 700;">Recruiter Dashboard</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Monitor hiring pipelines, match velocity, and top matching talent.</p>
+            </div>
+            <div style="display: flex; gap: 0.8rem;">
+                <a href="/job" class="btn btn-primary">
+                    ➕ Post New Job
+                </a>
+                <a href="/candidates" class="btn btn-secondary">
+                    👥 Screen Candidates
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics Overview -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💼</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTotalJobs">0</div>
+                    <div class="stat-label">Total Jobs</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📄</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTotalCandidates">0</div>
+                    <div class="stat-label">Resumes Processed</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statAvgScore">0%</div>
+                    <div class="stat-label">Average Match</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statEvaluations">0</div>
+                    <div class="stat-label">AI Evaluations</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Distribution Analytics -->
+        <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>🔥 Most In-Demand Skills (Job Postings)</h2>
+                </div>
+                <div class="card-body" id="demandSkillsList">
+                    <div style="color: var(--text-muted); font-size: 0.88rem;">Loading skill trends...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>💼 Top Skills in Candidate Pool</h2>
+                </div>
+                <div class="card-body" id="candidateSkillsList">
+                    <div style="color: var(--text-muted); font-size: 0.88rem;">Loading candidate skills...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Ranked Candidates Across Jobs -->
+        <section class="card">
+            <div class="card-header">
+                <h2>🌟 Top Performing Candidates</h2>
+                <a href="/candidates" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+                    View All &rarr;
+                </a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Job Applied / Matched</th>
+                                <th>Match Score</th>
+                                <th>Matched Skills</th>
+                                <th>Missing Skills</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topCandidatesBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    Loading analytics...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

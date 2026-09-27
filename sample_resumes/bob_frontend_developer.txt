@@ -1,0 +1,20 @@
+Bob Martinez
+Email: bob.martinez@email.com
+Phone: +1-555-014-9922
+
+SUMMARY:
+Creative Frontend Engineer specializing in responsive web applications, interactive user interfaces, and state management using JavaScript, TypeScript, React, and Next.js.
+
+TECHNICAL SKILLS:
+- Languages: JavaScript, TypeScript, HTML5, CSS3
+- Frameworks: React, Next.js, Vue.js, Tailwind CSS, Bootstrap
+- Tools: Git, Webpack, Jest, Figma
+
+PROFESSIONAL EXPERIENCE:
+Frontend Developer | PixelCraft Studio | 2022 - Present
+- Designed and built responsive web applications using React, Next.js, and Tailwind CSS.
+- Improved frontend Core Web Vitals and LCP scores by 35%.
+- Integrated REST APIs with client-side state management.
+
+EDUCATION:
+B.S. in Information Technology | City College (2018 - 2022)

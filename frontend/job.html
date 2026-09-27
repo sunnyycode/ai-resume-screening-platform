@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Postings Management - SmartScreen AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/job" class="active">Jobs</a></li>
+                <li><a href="/candidates">Candidates</a></li>
+                <li><a href="/live-match">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 1.85rem; font-weight: 700;">Job Postings</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Create role definitions, skill criteria, and review active listings.</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: flex-start;">
+            <!-- Create Job Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📝 Post a New Job</h2>
+                </div>
+                <div class="card-body">
+                    <div id="jobAlert"></div>
+                    <form id="createJobForm">
+                        <div class="form-group">
+                            <label for="jobTitle">Job Title *</label>
+                            <input type="text" id="jobTitle" class="form-control" placeholder="e.g. Senior Python Developer" required>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="jobExp">Experience Required</label>
+                                <input type="text" id="jobExp" class="form-control" placeholder="e.g. 2-4 years" value="1-3 years">
+                            </div>
+                            <div class="form-group">
+                                <label for="jobEdu">Education Required</label>
+                                <input type="text" id="jobEdu" class="form-control" placeholder="e.g. B.Tech / BCA / BS" value="Bachelor's in CS / IT">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jobSkills">Required Technical Skills * (comma-separated)</label>
+                            <input type="text" id="jobSkills" class="form-control" placeholder="e.g. Python, Flask, SQL, REST API, Git" required>
+                            <small style="color: var(--text-muted); font-size: 0.78rem;">These skills are strictly evaluated in the candidate skill match score.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prefSkills">Preferred / Bonus Skills (comma-separated)</label>
+                            <input type="text" id="prefSkills" class="form-control" placeholder="e.g. Docker, AWS, Redis, Machine Learning">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jobDesc">Job Description * (min 20 characters)</label>
+                            <textarea id="jobDesc" class="form-control" rows="5" placeholder="Detail the day-to-day responsibilities, stack requirements, and company mission..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            Publish Job Posting
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Active Jobs List -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 1.3rem;">Active Job Postings</h2>
+                    <button onclick="loadJobsList()" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+                </div>
+
+                <div id="jobsList">
+                    <!-- Populated dynamically via jobs.js -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/jobs.js"></script>
+</body>
+</html>

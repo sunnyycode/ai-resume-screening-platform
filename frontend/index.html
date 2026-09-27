@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening & Job Matching Platform</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <span>⚡</span> SmartScreen <span>AI</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/job">Jobs</a></li>
+                <li><a href="/candidates">Candidates</a></li>
+                <li><a href="/live-match">Live Sandbox</a></li>
+                <li id="navAuth">
+                    <a href="/login" class="btn btn-primary btn-sm">Login / Register</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Intelligent Resume Screening &<br><span>Candidate Matching</span></h1>
+            <p>
+                Eliminate manual resume review with multi-layered NLP matching. Combines TF-IDF keyword extraction,
+                deep contextual semantic embeddings, and automated technical skill verification into an explainable candidate ranking.
+            </p>
+            <div class="hero-actions">
+                <a href="/login" class="btn btn-primary" style="padding: 0.8rem 1.8rem; font-size: 1.05rem;">
+                    Get Started Free
+                </a>
+                <a href="/dashboard" class="btn btn-secondary" style="padding: 0.8rem 1.8rem; font-size: 1.05rem;">
+                    Recruiter Dashboard
+                </a>
+            </div>
+        </section>
+
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>Multi-Format Parsing</h3>
+                <p>Seamlessly extracts structured text and candidate contact metadata from PDF, Word (DOCX), and plain text documents with corrupted file safeguards.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Contextual Semantic AI</h3>
+                <p>Employs Transformer neural embeddings to understand concepts and domain synonyms—identifying that "Predictive Modeling" matches "Machine Learning".</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>TF-IDF Keyword Scoring</h3>
+                <p>Calculates term frequency-inverse document frequency vector similarity to gauge vocabulary alignment and technical depth between resumes and postings.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Transparent Skill Matching</h3>
+                <p>Directly extracts required and preferred technical stacks, clearly displaying which skills candidates possess and where curriculum gaps exist.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚖️</div>
+                <h3>Weighted Scoring Engine</h3>
+                <p>Configurable weighted formulation combining TF-IDF (30%), Semantic Context (40%), and Skill Accuracy (30%) into an objective 0–100% score.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Explainable Decision Reports</h3>
+                <p>Detailed breakdowns showing point contributions, domain strengths (Backend, Cloud, ML), and actionable recommendations for interview panels.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SmartScreen AI — AI-Powered Resume Screening & Job Matching Platform.</p>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>
